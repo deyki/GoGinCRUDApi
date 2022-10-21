@@ -127,6 +127,5 @@ func UpdateUserById(userID int, u *User) (*UserResponseModel, *util.ErrorMessage
 
 	db.Save(&user)
 
-	
 	return &UserResponseModel{user.Username, user.Email}, nil
 }

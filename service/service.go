@@ -106,3 +106,26 @@ func DeleteUserById(userID int) *util.ErrorMessage {
 
 	return nil
 }
+
+
+func UpdateUserById(userID int, u *User) (*UserResponseModel, *util.ErrorMessage) {
+
+	db, err := ConnectDB()
+	if err != nil {
+		return nil, util.ErrorMessage{}.FailedToOpenDB()
+	}
+
+	var user User
+
+	errorMessage := db.First(&user, userID).Error
+	if errorMessage != nil {
+		return nil, util.ErrorMessage{}.UserNotFound()
+	}
+
+	user.Username = u.Username
+	user.Email = u.Email
+
+	db.Save(&user)
+
+	return &UserResponseModel{user.Username, user.Email}, nil
+}

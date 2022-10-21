@@ -81,6 +81,33 @@ func deleteUserByIdHanlder(c *gin.Context) {
 }
 
 
+func updateUserByIdHandler(c *gin.Context) {
+
+	pathVariable := c.Param("userID")
+
+	var user service.User
+
+	err := c.BindJSON(&user)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"Message": "Bad request"})
+		return
+	}
+
+	userID, err := strconv.Atoi(pathVariable)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"Message": "Failed to convert pathVariable to userID(int)"})
+		return
+	}
+
+	userResponseModel, errorMessage := service.UpdateUserById(userID, &user)
+	if errorMessage != nil {
+		c.IndentedJSON(errorMessage.HttpStatus, gin.H{"Error": errorMessage})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"Updated user": userResponseModel})
+}
+
 func GinRouter() {
 
 	router := gin.Default()
@@ -88,6 +115,7 @@ func GinRouter() {
 	router.GET("/getUser/:userID", getUserByIdHandler)
 	router.GET("/users", getUsersHandler)
 	router.DELETE("/deleteUser/:userID", deleteUserByIdHanlder)
+	router.PUT("/updateUser/:userID", updateUserByIdHandler)
 	router.Run()
 }
 
